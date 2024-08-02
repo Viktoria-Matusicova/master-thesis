@@ -6,4 +6,5 @@ Video ukážka bola použitá pri obhajobe, preto je video bez zvuku a v pomalš
 
 Text záverečnej práce je dostupný na:
 https://dspace.vut.cz/server/api/core/bitstreams/34f86330-9591-4a20-a50a-a6b7810c2229/content
+
 Posudky záverečnej práce sú dostupné na: https://dspace.vut.cz/server/api/core/bitstreams/d169622b-f400-4673-a32a-dcfcbcfae950/content
