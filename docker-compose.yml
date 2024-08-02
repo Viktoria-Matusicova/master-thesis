@@ -1,0 +1,92 @@
+# Please refer https://aka.ms/HTTPSinContainer on how to setup an https developer certificate for your ASP .NET Core service.
+
+version: '3.6'
+
+secrets:
+  sql_password:
+    external: true
+  sql_username:
+    external: true
+  security_key:
+    external: true
+  cert:
+    file: #part_to_cert
+  key:
+    file: #part_to_cert_key
+networks:
+  my_network:
+volumes:
+  redis_data:
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - #port
+    networks:
+      - my_network
+    restart: on-failure
+  redis:
+    image: redis:latest
+    ports:
+      - #port
+    networks:
+      - my_network
+    volumes:
+      - redis_data:/data
+    restart: on-failure
+  ruleservice:
+    image: ruleservice
+    build:
+      context: .
+      dockerfile: microservices/ms-ruleService/Dockerfile
+    restart: on-failure
+    depends_on:
+      - rabbitmq
+      - websocketservice
+    networks:
+      - my_network
+    secrets:
+      - sql_password
+      - sql_username
+    environment:
+      - SQL_PASSWORD= #path_to_secret
+      - SQL_USERNAME= #path_to_secret
+  websocketservice:
+    image: websocketservice
+    build:
+      context: .
+      dockerfile: microservices/ms-webSocketService/Dockerfile
+    restart: on-failure  
+    secrets:
+      - cert
+      - key
+    environment:
+      - CERT= #path_to_secret
+      - KEY= #path_to_secret
+    ports:
+    ports:
+      - #port
+    networks:
+      - my_network
+    depends_on:
+      - redis
+    links:
+      - redis
+  frontend:
+    image: frontend
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    ports:
+      - #port
+    networks:
+      - my_network
+    depends_on:
+      - webapigateway
+    secrets:
+      - cert
+      - key
+    environment:
+      - CERT= #path_to_secret
+      - KEY= #path_to_secret
